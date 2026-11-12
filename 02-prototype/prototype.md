@@ -18,5 +18,5 @@ _____
 ## Debrief
 
 - **What worked:** We didn't have too much time to collect feedback but I have summarized peer comments and my initial feedback on the first prototype below.
-- **What broke / felt like a toy:** The original prototype was for Juno to create a signal debrief for a PM to pull on demand, accessible from Slack. After seeing the initial prototype, I questioned the impact (fake good) so redid the prototype to so that Juno can be a triage tool to help sort/categorize signals, by priority, signal type and recommend owners assignment, allowing the PM on duty to adjust (as necessary) and approve. 
-- **What I'd change next pass:** Feedback from peers who saw the original prototype was that debriefs can get lengthy. 
+- **What broke / felt like a toy:** The original prototype was for Juno to create a signal brief for a PM to pull on demand, accessible from Slack. After seeing the initial prototype, I questioned the impact (fake good) so redid the prototype to so that Juno can be a triage tool that will pull signals from the past 24 hours and sort/categorize them, by priority, signal type and recommend owners for assignment, allowing the PM on duty to adjust (as necessary) and approve. 
+- **What I'd change next pass:** Feedback from peers who saw the original prototype was that briefs can get lengthy. 
