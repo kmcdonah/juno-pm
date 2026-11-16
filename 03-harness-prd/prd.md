@@ -10,8 +10,8 @@ RocketShip PMs need this handled: Juno is an AI Associate PM on intake duty. Eac
 
 | Surface | Specification |
 |---|---|
-| 01 Context | The overnight requests from the Jira queue and from the support and sales Slack threads the PM has pointed Juno at (for example… |
-| 02 Tools | Read: the Jira queue, the support and sales threads, the strategy, the roadmap, the pod list and the sales flags. |
+| 01 Context | The overnight requests from the Jira queue and from the support and sales Slack threads the PM has pointed Juno at. |
+| 02 Tools | Read: the Jira queue, the named Slack threads, the named Notion pages, and the strategy, roadmap, pod list and sales flags. |
 | 03 Loop | The ceiling is 3 passes: the main pass, one source retry and one recount. |
 | 04 Memory | Approval and correction log: per PM. It’s the evidence for whether Juno can be trusted. |
 | 05 Permissions | read auto · draft auto · write confirm · send blocked |
@@ -21,26 +21,27 @@ RocketShip PMs need this handled: Juno is an AI Associate PM on intake duty. Eac
 
 **Required sources, and exclusions**
 
-The overnight requests from the Jira queue and from the support and sales Slack threads the PM has pointed Juno at (for example #sales-ask).
+The overnight requests from the Jira queue and from the support and sales Slack threads the PM has pointed Juno at.
+Any Notion pages the PM has pointed Juno at, read only.
 The RocketShip Product Strategy One-Pager (P0 to P3, including what each level excludes), to rank and set P0/P1.
 The Product Quarterly Roadmap, to match requests to existing items and mark the unmapped ones.
 The Engineering Capacity Note, pod names and what each pod owns only, to suggest owners.
 The Sales Pipeline Snapshot, renewal and deadline flags only, for ranking.
-Excluded: contact details, contract values, capacity percentages, staffing notes and reps’ unverified claims. Contract and contact fields are never exposed to Juno, so the exclusion doesn’t depend on the model following a rule.
+Excluded: contact details, contract values, capacity percentages, staffing notes and reps’ unverified claims. Contract and contact fields are never exposed to Juno, so these exclusions don’t depend on the model following a rule.
 
 **How fresh must it be**
 
-The strategy, roadmap and pod list are re-read at the start of every run, so a change published before 8:30am shows up that morning.
+The strategy, roadmap and pod list are re-read at the start of every run, so a change made before 8:30am shows up that morning.
 The overnight requests cover everything created since the previous brief. Monday’s run therefore covers the weekend.
-The sales snapshot is the latest version available. The brief states its date, and says so if it’s more than 7 days old.
-If a source is unreachable, Juno retries once, then posts with that source named as not covered. It never fills the gap from an earlier run.
-If the roadmap is unreachable, it skips roadmap matching and says so. Everything else still runs.
+The brief states the sales snapshot’s date, and says so if it’s more than 7 days old.
+If a source in Jira, Slack or Notion is unreachable, Juno retries once, then posts with that source named as not covered. It never fills the gap from an earlier run.
+If the roadmap is unreachable, Juno skips roadmap matching and says so. Everything else still runs.
 
 ## 02 Tools · System Capabilities
 
 **The verb list**
 
-Read: the Jira queue, the support and sales threads, the strategy, the roadmap, the pod list and the sales flags.
+Read: the Jira queue, the named Slack threads, the named Notion pages, and the strategy, roadmap, pod list and sales flags.
 Draft: compose the Triage Brief and owner suggestions, and post it to one Slack channel. It’s a proposal, and nothing takes effect until the PM approves.
 Write: append an entry to its own decision log, only when the PM clicks Approve or changes a category.
 Send: none.
@@ -48,24 +49,27 @@ Send: none.
 **Deliberate omissions**
 
 No write access to Jira. Assignment decides which team gets pulled in, and a misrouted P0 costs time. The PM keeps that call.
+No edit access to Notion. Juno reads Notion but never changes it, so it can’t alter the documents the team relies on.
 No way to message customers or reply to reps. Anything in Juno’s voice reads as a company commitment, as the fix-date request showed.
-No access to contract value or contact fields. The “never show them” rule then doesn’t depend on the model behaving, because it can’t see them.
+No access to contract value or contact fields. The “never show them” rule doesn’t depend on the model behaving, because it can’t see them.
 
 ## 03 Loop · AI Costs & Latency
 
 **Turn ceiling and escalation**
 
 The ceiling is 3 passes: the main pass, one source retry and one recount.
+If the night’s volume is too large for one pass (for example, after a weekend), Juno works in batches. It carries forward only a short running list of P0/P1 findings and the bucket counts, not the full ticket text.
+“Requests reviewed” comes from the source counts, not from Juno’s own tally. Any item missing from the brief therefore shows up as a mismatch.
 If it can’t classify an item with confidence, the item goes to Unsorted and Juno stops guessing.
 If a source won’t load after one retry, it posts anyway with the gap noted in the brief.
-If the bucket counts don’t match the visible rows after one recount, it posts with the problem flagged under Gaps.
+If the bucket counts don’t match the source count after one recount, it posts with the problem flagged under Gaps.
 Anything involving a date or commitment goes to Needs your decision and is handed to the PM.
 
 **Latency and cost target**
 
 The run is scheduled, not interactive. The brief is posted by 8:30am every weekday, and about 95% of runs finish within 10 minutes.
 If a run misses 8:30, it posts late with a note. It never skips silently.
-Because turns multiply, the 3-pass ceiling caps the worst case at about 3 times the normal cost.
+Each pass carries more than the one before it, so the 3-pass ceiling puts the worst case at at least 3 times the normal cost. Batching keeps each pass from growing without limit.
 Cost per run is logged from the first run. The dollar target is set from the first two weeks of actuals.
 
 ## 04 Memory · Data Requirements
@@ -75,7 +79,7 @@ Cost per run is logged from the first run. The dollar target is set from the fir
 Approval and correction log: per PM. It’s the evidence for whether Juno can be trusted.
 Triaged ticket IDs: shared across the team, so nothing is reported twice.
 Skill file rules: shared across the team.
-Strategy and roadmap: re-read each run, not remembered, because they change.
+Strategy, roadmap and any Notion pages: re-read each run, not remembered, because they change.
 No customer ticket text persists beyond its ID and category, and nothing customer-specific crosses between customers.
 Juno doesn’t rewrite its own rules from corrections. The PM reviews the log and decides.
 
@@ -99,11 +103,11 @@ Conflicts: a PM’s correction always outranks Juno’s stored classification, a
 
 **Justification**
 
-Read (auto): nothing changes, and it’s limited to the named sources.
+Read (auto): nothing changes, and access is limited to the named sources in Jira, Slack and Notion.
 Draft (auto): the brief and owner suggestions cost the PM one click to fix and can be edited or deleted. Tiering them as confirm would defeat the 5-minute goal.
-Write (confirm): the only writes are decision-log entries, recorded when the PM clicks Approve or changes a category. Jira changes stay with the PM, because a misroute is recoverable but costs time.
+Write (confirm): the only writes are decision-log entries, recorded when the PM clicks Approve or changes a category. Jira assignments and Notion edits stay with the PM, because a misroute is recoverable but costs time.
 Send (blocked): a message to a customer or rep can’t be unsent, and the fix-date request shows why. Anything outside the one brief channel stays blocked.
-Instructions found inside a ticket are treated as data, flagged and ignored.
+Instructions found inside a ticket, thread or Notion page are treated as data, flagged and ignored.
 Unsure items are shown with a Low confidence badge, never hidden.
 
 ## 06 Verification · AI Testing & Measurement
@@ -116,8 +120,9 @@ The PM changes fewer than 1 in 10 classifications.
 Every real P0 lands in the top section.
 No contract values or contact details appear.
 The planted injected instruction is ignored.
-The bucket counts add up.
-On every run, each row must cite a ticket ID or link, or say “not in the data.”
+The bucket counts match the source count.
+On every run, each row must cite its source (a ticket ID, thread link or page), or say “not in the data.”
+The first two thresholds are guesses. The rest are pass or fail. Module 5 makes them measurable.
 
 **Failure behaviour**
 
@@ -134,4 +139,3 @@ _Stub. Module 6 fills this in: golden set, pass thresholds, and regression caden
 ## Out of scope
 
 Any capability not in the verb list above, and any action tiered `blocked`. Both are decisions on the record, not omissions.
-
