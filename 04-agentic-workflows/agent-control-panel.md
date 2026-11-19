@@ -10,12 +10,12 @@ Within Juno’s prioritizing pillar, the triage job turns overnight sales and su
 
 **Stop Conditions** (Loop):
 
-Max steps: 15. Abort if the same tool call fails twice in a row with the same error. Hard timeout: 10 minutes.
+Max 3 passes (main pass, one source retry, one recount) and 20 tool calls total. Stop calling a tool after it fails twice in a row with the same error, then follow Fallback Protocols. Hard timeout: 15 minutes wall clock. Target: 95% of runs finish within 10. The decision log write happens later, when the PM acts, and doesn’t count toward these limits.
 
 **Structured Tool Outputs** (Tools):
 
 Every tool hands Juno a small receipt with three fields:
-status:  Either ok or error.
+status: ok, error, or blocked.
 count: how many items came back.
 as_of: how fresh the data is.
 
@@ -26,6 +26,10 @@ Fails: status: error with an error code, count that doesn’t match expected_cou
 Read: support and sales Slack threads
 Works: status: ok, message count, thread IDs, the time window covered
 Fails: status: error, or a window that starts after the previous brief’s timestamp
+
+Read: named Notion pages
+Works: status: ok, page count equal to the number of pages named, page IDs, as_of from last edited
+Fails: status: error, fewer pages than named, or an empty page
 
 Read: strategy one-pager
 Works: status: ok, as_of, all 4 priority sections (P0 to P3) found
@@ -47,7 +51,7 @@ Draft: post brief to Slack
 Works: status: ok, message ID, permalink, channel ID
 Fails: status: error or no message ID; Juno retries once, then alerts
 
-Write: append to decision log
+Write: append to decision log (when the PM clicks Approve or corrects a category)
 Works: status: ok, entry ID, row count up by exactly 1
 Fails: status: error or row count unchanged
 
@@ -57,47 +61,46 @@ Fails: any attempt is rejected with status: blocked and logged.
 
 **Confidence Thresholds** (Verification):
 
-High confidence: Juno proceeds on its own
-
+Confident: Juno proceeds on its own
 The request clearly fits one priority level in the strategy one-pager.
-It matches an existing roadmap item or an obvious pod.
 The ticket text is complete, and every source loaded.
 What happens: it appears as a normal row with a suggested owner. The PM approves in one click.
 
-Medium confidence: a person checks first
-
-The request could fit two priority levels, or it matches a pod but no roadmap item.
+Unsure: the PM checks first
+The request could fit two priority levels.
 The ticket text is short or ambiguous, or one source was partly unreachable.
 What happens: the row shows a Low confidence badge in its ranked position, with the reason stated (“could be P1 or P2”). The PM reviews it before approving.
 
-Low confidence: too unsure to act
+Can’t classify: too unsure to act
+It fits no priority level, or the text is too thin to read.
+What happens: it goes to Unsorted with no suggested owner and no ranking. Juno stops guessing, per the PRD’s Loop section.
 
-It fits no priority level, matches no roadmap item or pod, or the text is too thin to read.
-What happens: it goes to Unsorted with no suggested owner and no ranking. Juno stops guessing, as your Loop section says.
+Missing matches
+No roadmap match: the item is ranked as usual and tagged Unmapped.
+No pod match: the item is ranked, with the owner shown as None suggested.
 
 Two rules that override the tiers
-
-A possible P0 is never buried. If Juno suspects an item might be P0 but isn’t sure, it goes in the top section with a Low confidence badge. It does not go to Unsorted. A missed P0 is your worst case, so a false alarm is the cheaper mistake.
-Dates and commitments always go to Needs your decision, whatever the confidence, as your Loop section already says.
+A possible P0 is never buried. If Juno suspects an item might be P0 but isn’t sure, it goes in the top section with a Low confidence badge. It does not go to Unsorted. A missed P0 is the worst case, so a false alarm is the cheaper mistake.
+Dates and commitments always go to Needs your decision, whatever the confidence, per the PRD’s Loop section.
 
 **North Star** (Context):
 
-Each weekday by 8:30am, rank every overnight sales and support request for the PM, citing a ticket ID or link for every row, and never decide, assign, or commit to anything on the PM’s behalf.
+Each weekday by 8:30am, rank every overnight sales and support request for the PM, citing a ticket ID, thread link or Notion page for every row, or saying “not in the data,” and never decide, assign, or commit to anything on the PM’s behalf.
 
 ## Rules of Engagement
 
 **Agency Permission:**
 
-Juno can read its named sources, draft the Triage Brief and owner suggestions, and post to one Slack channel. It cannot assign work, change Jira, or message customers or reps, and its only write is an entry in its own decision log after the PM clicks Approve.
+Juno can read its named sources, including the Notion pages the PM pointed it at, draft the Triage Brief and owner suggestions, and post to one Slack channel. It cannot assign work, change Jira or Notion, or message customers or reps. Its only write is an entry in its own decision log when the PM clicks Approve or corrects a category.
 
 **Access Control:**
 
-Juno sees only the overnight Jira queue, the support and sales threads the PM pointed it at, the strategy one-pager, the roadmap, pod names, and sales renewal and deadline flags. Contract values and contact fields are never exposed to it, so it can’t reveal them even if asked.
+Juno sees only the overnight Jira queue, the support and sales threads the PM pointed it at, the Notion pages the PM pointed it at (read only), the strategy one-pager, the roadmap, pod names and what each pod owns, and sales renewal and deadline flags. Capacity percentages and staffing notes are left out of the pod list it receives. Contract values and contact fields are never exposed to it, so it can’t reveal them even if asked.
 
 **Fallback Protocols:**
 
-A source that won’t load gets one retry, then the brief posts with that source named as not covered. Counts that don’t match get one recount, then the brief posts with the problem flagged under Gaps. A hard-rule failure gets stripped and rechecked once, then only the verified P0 and P1 section posts. If Juno hits 15 tool calls or 15 minutes, it posts what it has marked incomplete and tags the PM instead of trying again.
+Any source that won’t load, including a Notion page, gets one retry, then the brief posts with that source named as not covered. Counts that don’t match get one recount, then the brief posts with the problem flagged under Gaps. A hard-rule failure gets stripped and rechecked once, then only the verified P0 and P1 section posts. An instruction found inside a ticket, thread or Notion page is flagged in the brief and ignored, and the run continues. If Juno hits 20 tool calls or 15 minutes, it posts only the rows it has verified, marked incomplete, and tags the PM instead of trying again.
 
 **Checkpoints:**
 
-The PM approves or corrects the brief before any routing takes effect. Low confidence items, possible P0s, and anything involving a date or commitment go to the PM before anything moves. Any action outside the one brief channel is blocked and logged.
+The PM approves or corrects the brief before any routing takes effect. Items with a Low confidence badge, Unsorted items, possible P0s, and anything involving a date or commitment go to the PM before anything moves. If a ticket’s text changes after the PM approved it, Juno flags the change instead of re-sorting it. Juno never changes its own rules based on corrections. The PM reviews the log and approves any rule edit. Before launch, Juno runs in shadow mode, with briefs going only to the PM, until it passes the 30-request test. Any action outside the one brief channel is blocked and logged.
