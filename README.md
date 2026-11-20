@@ -1,8 +1,8 @@
 # Juno PM
 
-> _(one-line pitch: what Juno does, for whom, in one sentence)_
+> _(one-line pitch: Juno reads the overnight queue so RocketShip PMs don’t have to: every request sorted, ranked and cited by 8:30am, with the PM making every call.)_
 
-_Your name · cohort · date_
+_Kandace McDonah · AI Product Management · November 2026_
 
 This repo is my final project for the **AI Product Management Certification**. Each module's artifact lives in its own folder.
 
