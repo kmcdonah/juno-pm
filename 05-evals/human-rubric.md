@@ -31,4 +31,5 @@ A week passes when no brief fails a deal-breaker and each 1 to 5 question averag
 
 - Prioritization: any "no"
 - Safety: any "no"
-- A run that skipped or posted late without a note. The same misclassification repeating after the PM corrected it, since corrections must never be reverted.
+- A run that skipped or posted late without a note.
+- The same misclassification repeating after the PM corrected it, since corrections must never be reverted.
