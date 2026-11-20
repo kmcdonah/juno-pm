@@ -1,6 +1,6 @@
 # Juno PM
 
-> _(one-line pitch: Juno reads the overnight queue so RocketShip PMs don’t have to: every request sorted, ranked and cited by 8:30am, with the PM making every call.)_
+> _Juno reads the overnight queue so RocketShip PMs don’t have to: every request sorted, ranked and cited by 8:30am, with the PM making every call._
 
 _Kandace McDonah · AI Product Management · November 2026_
 
