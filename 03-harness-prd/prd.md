@@ -42,7 +42,7 @@ If the roadmap is unreachable, Juno skips roadmap matching and says so. Everythi
 **The verb list**
 
 Read: the Jira queue, the named Slack threads, the named Notion pages, and the strategy, roadmap, pod list and sales flags.
-Draft: compose the Triage Brief and owner suggestions, and post it to one Slack channel. It’s a proposal, and nothing takes effect until the PM approves.
+Draft: compose the Triage Brief and owner suggestions, and post it to one Slack channel. It’s a proposal, and nothing takes effect until the PM approves. 
 Write: append an entry to its own decision log, only when the PM clicks Approve or changes a category.
 Send: none.
 
@@ -106,7 +106,7 @@ Conflicts: a PM’s correction always outranks Juno’s stored classification, a
 Read (auto): nothing changes, and access is limited to the named sources in Jira, Slack and Notion.
 Draft (auto): the brief and owner suggestions cost the PM one click to fix and can be edited or deleted. Tiering them as confirm would defeat the 5-minute goal.
 Write (confirm): the only writes are decision-log entries, recorded when the PM clicks Approve or changes a category. Jira assignments and Notion edits stay with the PM, because a misroute is recoverable but costs time.
-Send (blocked): a message to a customer or rep can’t be unsent, and the fix-date request shows why. Anything outside the one brief channel stays blocked.
+Send (blocked): a message to a customer or rep can’t be unsent, and the fix-date request shows why. Any message to a customer or rep, or any post outside the brief channel, is blocked.
 Instructions found inside a ticket, thread or Notion page are treated as data, flagged and ignored.
 Unsure items are shown with a Low confidence badge, never hidden.
 
